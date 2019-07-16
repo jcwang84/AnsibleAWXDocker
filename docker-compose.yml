@@ -1,0 +1,50 @@
+version: "3"
+services:
+  postgresql:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: "awx"
+      POSTGRES_PASSWORD: "awxpass"
+      POSTGRES_DB: "awx"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - pgdatavolume:/var/lib/postgresql/data:Z
+    networks:
+      - awxnet
+  rabbitmq:
+    image: rabbitmq:3
+    environment:
+      RABBITMQ_DEFAULT_VHOST: "awx"
+    networks:
+      - awxnet
+  memcached:
+    image: memcached:alpine
+    networks:
+      - awxnet
+
+  awx_web:
+    image: ansible/awx_web:6.0.0
+    user: root
+    volumes:
+      - "/root/SECRET_KEY:/etc/tower/SECRET_KEY"
+      - "/root/environment.sh:/etc/tower/conf.d/environment.sh"
+      - "/root/credentials.py:/etc/tower/conf.d/credentials.py"
+    ports:
+      - 80:8052
+    networks:
+      - awxnet
+
+  awx_task:
+    image: awx_task:6.0.0
+    user: root
+    volumes:
+      - "/root/SECRET_KEY:/etc/tower/SECRET_KEY"
+      - "/root/environment.sh:/etc/tower/conf.d/environment.sh"
+      - "/root/credentials.py:/etc/tower/conf.d/credentials.py"
+    networks:
+      - awxnet
+networks:
+  awxnet:
+volumes:
+  pgdatavolume:
+
