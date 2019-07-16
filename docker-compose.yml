@@ -35,7 +35,7 @@ services:
       - awxnet
 
   awx_task:
-    image: awx_task:6.0.0
+    image: ansible/awx_task:6.0.0
     user: root
     volumes:
       - "/root/SECRET_KEY:/etc/tower/SECRET_KEY"
